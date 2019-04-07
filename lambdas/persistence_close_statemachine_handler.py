@@ -36,5 +36,23 @@ class ClosePipeline:
             LoggerUtility.logError("Unable to delete sqs message for batchId {}".format(batchId))
             raise e
     
+    def __push_batchid_to_nightly_sqs_queue(self, event, context):
+        current_batch_id = ""
+        try:
+            if "batchId" in event[0]:
+                sqs = boto3.resource('sqs')
+                current_batch_id = event[0]["batchId"]
+                nightly_queue_name = os.environ["SQS_NIGHTLY_PERSISTENCE_QUEUE_NAME"]
+                nightly_batches_queue = sqs.get_queue_by_name(QueueName=nightly_queue_name)
+                response = nightly_batches_queue.send_message(MessageBody=json.dumps({
+                    'BatchId': current_batch_id
+                }), MessageGroupId="WazeNightlyPersistenceBatchesMessageGroup")
+                LoggerUtility.logInfo("Successfully pushed the message to nightly queue for batchid -"
+                                      " {}".format(current_batch_id))
+        except Exception as e:
+            LoggerUtility.logError("Unable to delete sqs message for batchId {}".format(current_batch_id))
+            raise e
+    
     def close_pipeline(self, event, context):
+        self.__push_batchid_to_nightly_sqs_queue(event, context)
         self.__delete_sqs_message(event, context)
