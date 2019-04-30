@@ -4,7 +4,7 @@ import os
 from common.logger_utility import *
 from common.constants import *
 
-sns = boto3.client('sns')
+sns = boto3.client('sns',region_name='us-west-2')
 class ClosePipeline:
 
     def __publish_message_to_sns(self, message):
