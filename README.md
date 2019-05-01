@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/usdot-jpo-sdc/sdc-dot-waze-close-persistence-pipeline.svg?branch=develop)](https://travis-ci.com/usdot-jpo-sdc/sdc-dot-waze-close-persistence-pipeline)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc_sdc-dot-waze-close-persistence-pipeline&metric=alert_status)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc_sdc-dot-waze-close-persistence-pipeline)
 # sdc-dot-waze-close-persistence-pipeline
 This lambda function is responsible for deleting the processed messages from the SQS and publishing the message to SNS about the persistence completion.
 
