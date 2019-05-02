@@ -12,5 +12,4 @@ addons:
         token:
              secure: "BYYFgT4nGyFN6k0hurlXnmAP3n/afOmjy+UAkU/M5/wLoM7kOSXsvhzQYyeXbG2SUg2DrKkyrw3gttfFRR3cyUmPp9xcmgvoYAp0v20IaLZ5Dcp9+Vvyaz3oOWCFCzvfMec+6TL2hjVGcvo+Np9F/CTQ1/fvzE13/WjaFDgef2VtggHe+LMY8UwkXvTVElmP+p0VF2zTl7HjRMJm8QgdcCbbaOD8rgFKUeuGGZ1z/h8vwa5+b7AOpNEYrfdVmHmgP5TokAjhzwaRmthaSCGUTg/altX06jsBo07dQD7xbUWdsyXUPYfqfqlQEutFCCO/9c6SsPSXszSUTgMyu413FFD458eToR/o/aJostPmJy98+XNJtLYlBcCG8se4EsPYGQKqSCwQMd0+inlCipKeaV+sUamTIbA4CmK54eKfo+1yiOxHTKAHqBvLsmb8AakoFI8Ldf6QQY/lstXcEpyWMaZMRK5qlVlAUYYe4nmnf20c0x7sCC1n+3m4YNGPUzjwB8n+hvhHO+KRMWhPquVA4z/dGL2JeCrMtv+zW3IT09AQVA0jdl/xWePRWpt5W62zAvleuWMkCsADPnUPo6bD+qnOUel4pRrrNwRh2wboAVaoFCAzOCQb2j6We22v48ChSdjjBat40TmRSghWmF/jdC8dXE1Jg3Clvp8yXz60iYg="
 script: 
-    - python persistence_close_statemachine_handler_main.py
     - sonar-scanner
