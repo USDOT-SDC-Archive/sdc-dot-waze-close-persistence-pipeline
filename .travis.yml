@@ -13,8 +13,8 @@ install:
     - pip install psycopg2 
 branches:
     only:
-        - master
-        - develop
+          - master
+          - develop
 addons:
     sonarcloud:
         organization: "usdot-jpo-sdc"
