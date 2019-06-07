@@ -8,7 +8,6 @@ install:
     - pip install moto
     - pip install coverage
     - pip install pytest
-    - pip install json
     - pip install utils
 branches:
     only:
