@@ -16,7 +16,7 @@ branches:
 
 addons:
     sonarcloud:
-        organization: "usdot-jpo-sdc"
+        organization: "usdot-jpo-sdc-projects"
         
 script:
     - coverage erase
