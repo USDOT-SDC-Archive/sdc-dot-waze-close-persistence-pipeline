@@ -1,3 +1,3 @@
-[![Build Status](https://travis-ci.com/usdot-jpo-sdc/sdc-dot-waze-close-persistence-pipeline.svg?branch=develop)](https://travis-ci.com/usdot-jpo-sdc/sdc-dot-waze-close-persistence-pipeline)
+[![Build Status](https://travis-ci.org/debbieneaeraconsulting/sdc-dot-svp-ingest-test.svg?branch=master)](https://travis-ci.org/debbieneaeraconsulting/sdc-dot-svp-ingest-test)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline&metric=alert_status)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline&metric=coverage)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline)
