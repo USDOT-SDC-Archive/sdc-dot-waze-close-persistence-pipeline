@@ -1,42 +1,37 @@
 import boto3
 import json
-import os
 from common.logger_utility import *
-from common.constants import *
-
 sns = boto3.client('sns', region_name='us-east-1')
+
+
 class ClosePipeline:
 
     def publish_message_to_sns(self, message):
-        response = sns.publish(
+        sns.publish(
             TargetArn=os.environ['BATCH_NOTIFICATION_SNS'],
             Message=json.dumps({'default': json.dumps(message)}),
             MessageStructure='json'
         )
 
-    def delete_sqs_message(self, event, context):
-        batchId = ""
+    def delete_sqs_message(self, event):
+        batch_id = ""
         try:
             if "queueUrl" in event[0] and "batchId" in event[0]:
                 sqs = boto3.resource('sqs', region_name='us-east-1')
-                queueUrl = event[0]["queueUrl"]
-                receiptHandle = event[0]["receiptHandle"]
-                batchId = event[0]["batchId"]
-                # is_historical = event[0]["is_historical"] == "true"
-                # persistenceQueue = os.environ['SQS_PERSISTENCE_ORCHESTRATION_QUEUE_NAME']
-                # if (is_historical):
-                #     persistenceQueue = os.environ['SQS_PERSISTENCE_ORCHESTRATION_HIS_QUEUE_NAME']
-                txt=json.dumps(event[0])
+                queue_url = event[0]["queueUrl"]
+                receipt_handle = event[0]["receiptHandle"]
+                batch_id = event[0]["batchId"]
+                txt = json.dumps(event[0])
                 if json.loads(txt).get("queueUrl") is not None:
-                    message = sqs.Message(queueUrl, receiptHandle)
+                    message = sqs.Message(queue_url, receipt_handle)
                     message.delete()
-                    LoggerUtility.logInfo("Message deleted from sqs for batchId {}".format(batchId))
-                    self.publish_message_to_sns({"BatchId": batchId, "Status": "Persistence process completed"})
+                    LoggerUtility.logInfo("Message deleted from sqs for batchId {}".format(batch_id))
+                    self.publish_message_to_sns({"BatchId": batch_id, "Status": "Persistence process completed"})
         except Exception as e:
-            LoggerUtility.logError("Unable to delete sqs message for batchId {}".format(batchId))
+            LoggerUtility.logError("Unable to delete sqs message for batchId {}".format(batch_id))
             raise e
     
-    def push_batchid_to_nightly_sqs_queue(self, event, context):
+    def push_batch_id_to_nightly_sqs_queue(self, event):
         current_batch_id = ""
         try:
             if "batchId" in event[0]:
@@ -53,6 +48,6 @@ class ClosePipeline:
             LoggerUtility.logError("Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
             raise e
     
-    def close_pipeline(self, event, context):
-        self.push_batchid_to_nightly_sqs_queue(event, context)
-        self.delete_sqs_message(event, context)
+    def close_pipeline(self, event):
+        self.push_batch_id_to_nightly_sqs_queue(event)
+        self.delete_sqs_message(event)
