@@ -1,6 +1,7 @@
 import boto3
 import json
 from common.logger_utility import *
+
 sns = boto3.client('sns', region_name='us-east-1')
 
 
@@ -25,12 +26,12 @@ class ClosePipeline:
                 if json.loads(txt).get("queueUrl") is not None:
                     message = sqs.Message(queue_url, receipt_handle)
                     message.delete()
-                    LoggerUtility.logInfo("Message deleted from sqs for batchId {}".format(batch_id))
+                    LoggerUtility.log_info("Message deleted from sqs for batchId {}".format(batch_id))
                     self.publish_message_to_sns({"BatchId": batch_id, "Status": "Persistence process completed"})
         except Exception as e:
-            LoggerUtility.logError("Unable to delete sqs message for batchId {}".format(batch_id))
+            LoggerUtility.log_error("Unable to delete sqs message for batchId {}".format(batch_id))
             raise e
-    
+
     def push_batch_id_to_nightly_sqs_queue(self, event):
         current_batch_id = ""
         try:
@@ -42,12 +43,13 @@ class ClosePipeline:
                 response = nightly_batches_queue.send_message(MessageBody=json.dumps({
                     'BatchId': current_batch_id
                 }), MessageGroupId="WazeNightlyPersistenceBatchesMessageGroup")
-                LoggerUtility.logInfo("Successfully pushed the message to nightly queue for batchid -"
-                                      " {} with response - {}".format(current_batch_id, response))
+                LoggerUtility.log_info("Successfully pushed the message to nightly queue for batch_id -"
+                                       " {} with response - {}".format(current_batch_id, response))
         except Exception as e:
-            LoggerUtility.logError("Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
+            LoggerUtility.log_error(
+                "Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
             raise e
-    
+
     def close_pipeline(self, event):
         self.push_batch_id_to_nightly_sqs_queue(event)
         self.delete_sqs_message(event)

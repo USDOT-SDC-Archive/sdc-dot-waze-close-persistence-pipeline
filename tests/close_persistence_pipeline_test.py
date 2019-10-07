@@ -3,8 +3,10 @@ import sys
 import os
 import time
 import pytest
+import boto3
+from lambdas.persistence_close_statemachine_handler import ClosePipeline
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from lambdas.persistence_close_statemachine_handler import *
+
 
 @mock_sns
 def test_publish_message_to_sns():
@@ -82,4 +84,4 @@ def test_push_batch_id_to_nightly_sqs_queue():
 def test_close_pipeline():
     with pytest.raises(Exception):
         close_pipeline_obj = ClosePipeline()
-        assert close_pipeline_obj.close_pipeline(None, None) is None
+        assert close_pipeline_obj.close_pipeline(None) is None
