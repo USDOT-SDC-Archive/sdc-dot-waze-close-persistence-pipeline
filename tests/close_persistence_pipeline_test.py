@@ -1,24 +1,33 @@
-from moto import mock_sns, mock_sqs, mock_events
-import sys
 import os
+import sys
 import time
-import pytest
+from unittest.mock import patch, MagicMock
+from botocore.errorfactory import ClientError
+
 import boto3
+import pytest
+from moto import mock_sqs, mock_events
+
 from lambdas.persistence_close_statemachine_handler import ClosePipeline
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+os.environ['BATCH_NOTIFICATION_SNS'] = "batch_notification_sns"
+os.environ["SQS_NIGHTLY_PERSISTENCE_QUEUE_NAME"] = "SQS_NIGHTLY_PERSISTENCE_QUEUE_NAME"
 
-@mock_sns
+
+class MockSNS:
+    def publish(self, *args, **kwargs):
+        pass
+
+
+mock_client = MockSNS()
+
+
+@patch('lambdas.persistence_close_statemachine_handler.sns', mock_client)
 def test_publish_message_to_sns():
-    batch_id = str(int(time.time()))
-    topic_name = "dev-dot-sdc-cloudwatch-alarms-notification-topic"
-    message = {"BatchId": batch_id, "Status": "Persistence process completed"}
-    sns = boto3.client('sns', region_name='us-east-1')
-    response = sns.create_topic(Name=topic_name)
-    os.environ["BATCH_NOTIFICATION_SNS"] = response['TopicArn']
-    close_pipeline_obj = ClosePipeline()
-    close_pipeline_obj.publish_message_to_sns(message)
-    assert True
+    sqs_handler = ClosePipeline()
+    sqs_handler.publish_message_to_sns(None)
 
 
 @mock_sqs
@@ -43,8 +52,21 @@ def test_delete_sqs_message():
 
 
 @mock_sqs
+def test_delete_sqs_message_no_queue_url():
+    batch_id = str(int(time.time()))
+    queue_events = []
+    queue_event = dict()
+    queue_event["batchId"] = batch_id
+    queue_event["receiptHandle"] = "test"
+    queue_events.append(queue_event)
+    print(queue_events)
+    close_pipeline_obj = ClosePipeline()
+    close_pipeline_obj.delete_sqs_message(queue_events)
+
+
+@mock_sqs
 def test_push_batch_id_to_nightly_sqs_queue_raises_exception():
-    with pytest.raises(Exception):
+    with pytest.raises(ClientError):
         sqs = boto3.client('sqs', region_name='us-east-1')
         sqs.create_queue(QueueName='dev-dot-sdc-waze-data-nightly-elt.fifo',
                          Attributes={'FifoQueue': "true", 'DelaySeconds': "5", 'MaximumMessageSize': "262144",
@@ -80,8 +102,18 @@ def test_push_batch_id_to_nightly_sqs_queue():
     assert True
 
 
+"""
 @mock_events
 def test_close_pipeline():
     with pytest.raises(Exception):
         close_pipeline_obj = ClosePipeline()
         assert close_pipeline_obj.close_pipeline(None) is None
+"""
+
+
+def test_close_pipeline():
+    close_pipeline = ClosePipeline()
+    close_pipeline.push_batch_id_to_nightly_sqs_queue = MagicMock()
+    close_pipeline.delete_sqs_message = MagicMock()
+
+    close_pipeline.close_pipeline(None)
