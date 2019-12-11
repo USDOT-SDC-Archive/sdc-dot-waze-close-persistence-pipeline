@@ -50,7 +50,7 @@ def test_delete_sqs_message():
         queue_events.append(queue_event)
         print(queue_events)
         close_pipeline_obj = ClosePipeline()
-        close_pipeline_obj.delete_sqs_message(queue_events)
+        close_pipeline_obj.delete_sqs_message(queue_events, None)
 
 
 @mock_sqs
@@ -63,7 +63,7 @@ def test_delete_sqs_message_no_queue_url():
     queue_events.append(queue_event)
     print(queue_events)
     close_pipeline_obj = ClosePipeline()
-    close_pipeline_obj.delete_sqs_message(queue_events)
+    close_pipeline_obj.delete_sqs_message(queue_events, None)
 
 
 @mock_sqs
@@ -83,7 +83,7 @@ def test_push_batch_id_to_nightly_sqs_queue_raises_exception():
         queue_event["batchId"] = generated_batch_id
         queue_events.append(queue_event)
         close_pipeline_obj = ClosePipeline()
-        close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events)
+        close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events, None)
 
 
 @mock_sqs
@@ -106,7 +106,7 @@ def test_push_batch_id_to_nightly_sqs_queue():
     queue_event["batchId"] = generated_batch_id
     queue_events.append(queue_event)
     close_pipeline_obj = ClosePipeline()
-    close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events)
+    close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events, None)
     assert True
 
 
@@ -115,4 +115,4 @@ def test_close_pipeline():
     close_pipeline.push_batch_id_to_nightly_sqs_queue = MagicMock()
     close_pipeline.delete_sqs_message = MagicMock()
 
-    close_pipeline.close_pipeline(None)
+    close_pipeline.close_pipeline(None, None)
