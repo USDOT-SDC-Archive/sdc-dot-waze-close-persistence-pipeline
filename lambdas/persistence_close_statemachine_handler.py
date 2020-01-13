@@ -1,6 +1,9 @@
-import boto3
 import json
-from common.logger_utility import *
+import os
+
+import boto3
+
+from common.logger_utility import LoggerUtility
 
 sns = boto3.client('sns', region_name='us-east-1')
 
@@ -14,7 +17,8 @@ class ClosePipeline:
             MessageStructure='json'
         )
 
-    def delete_sqs_message(self, event):
+    def delete_sqs_message(self, event, context):
+        LoggerUtility.log_info("context: {}".format(context))
         batch_id = ""
         try:
             if "queueUrl" in event[0] and "batchId" in event[0]:
@@ -32,7 +36,8 @@ class ClosePipeline:
             LoggerUtility.log_error("Unable to delete sqs message for batchId {}".format(batch_id))
             raise e
 
-    def push_batch_id_to_nightly_sqs_queue(self, event):
+    def push_batch_id_to_nightly_sqs_queue(self, event, context):
+        LoggerUtility.log_info("context: {}".format(context))
         current_batch_id = ""
         try:
             if "batchId" in event[0]:
@@ -50,6 +55,6 @@ class ClosePipeline:
                 "Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
             raise e
 
-    def close_pipeline(self, event):
-        self.push_batch_id_to_nightly_sqs_queue(event)
-        self.delete_sqs_message(event)
+    def close_pipeline(self, event, context):
+        self.push_batch_id_to_nightly_sqs_queue(event, context)
+        self.delete_sqs_message(event, context)

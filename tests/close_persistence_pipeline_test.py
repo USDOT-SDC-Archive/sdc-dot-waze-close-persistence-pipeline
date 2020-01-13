@@ -2,11 +2,11 @@ import os
 import sys
 import time
 from unittest.mock import patch, MagicMock
-from botocore.errorfactory import ClientError
 
 import boto3
 import pytest
-from moto import mock_sqs, mock_events
+from botocore.errorfactory import ClientError
+from moto import mock_sqs
 
 from lambdas.persistence_close_statemachine_handler import ClosePipeline
 
@@ -35,9 +35,11 @@ def test_delete_sqs_message():
     with pytest.raises(Exception):
         batch_id = str(int(time.time()))
         sqs = boto3.client('sqs', region_name='us-east-1')
-        response = sqs.create_queue(QueueName='dev-dot-sdc-waze-data-persistence-orchestration',
-                                    Attributes={'FifoQueue': "false", 'DelaySeconds': "60",
-                                                'MaximumMessageSize': "262144", 'MessageRetentionPeriod': "1209600",
+        response = sqs.create_queue(QueueName="Queue_Name.fifo",
+                                    Attributes={'FifoQueue': "false",
+                                                'DelaySeconds': "60",
+                                                'MaximumMessageSize': "262144",
+                                                'MessageRetentionPeriod': "1209600",
                                                 'VisibilityTimeout': "960"})
         queue_url = response['QueueUrl']
         queue_events = []
@@ -48,7 +50,7 @@ def test_delete_sqs_message():
         queue_events.append(queue_event)
         print(queue_events)
         close_pipeline_obj = ClosePipeline()
-        close_pipeline_obj.delete_sqs_message(queue_events)
+        close_pipeline_obj.delete_sqs_message(queue_events, None)
 
 
 @mock_sqs
@@ -61,16 +63,19 @@ def test_delete_sqs_message_no_queue_url():
     queue_events.append(queue_event)
     print(queue_events)
     close_pipeline_obj = ClosePipeline()
-    close_pipeline_obj.delete_sqs_message(queue_events)
+    close_pipeline_obj.delete_sqs_message(queue_events, None)
 
 
 @mock_sqs
 def test_push_batch_id_to_nightly_sqs_queue_raises_exception():
     with pytest.raises(ClientError):
         sqs = boto3.client('sqs', region_name='us-east-1')
-        sqs.create_queue(QueueName='dev-dot-sdc-waze-data-nightly-elt.fifo',
-                         Attributes={'FifoQueue': "true", 'DelaySeconds': "5", 'MaximumMessageSize': "262144",
-                                     'MessageRetentionPeriod': "1209600", 'VisibilityTimeout': "960",
+        sqs.create_queue(QueueName="QueueName.fifo",
+                         Attributes={'FifoQueue': "true",
+                                     'DelaySeconds': "5",
+                                     'MaximumMessageSize': "262144",
+                                     'MessageRetentionPeriod': "1209600",
+                                     'VisibilityTimeout': "960",
                                      'ContentBasedDeduplication': "true"})
         generated_batch_id = str(int(time.time()))
         queue_events = []
@@ -78,15 +83,18 @@ def test_push_batch_id_to_nightly_sqs_queue_raises_exception():
         queue_event["batchId"] = generated_batch_id
         queue_events.append(queue_event)
         close_pipeline_obj = ClosePipeline()
-        close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events)
+        close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events, None)
 
 
 @mock_sqs
 def test_push_batch_id_to_nightly_sqs_queue():
     sqs = boto3.client('sqs', region_name='us-east-1')
-    response = sqs.create_queue(QueueName='dev-dot-sdc-waze-data-nightly-elt.fifo',
-                                Attributes={'FifoQueue': "true", 'DelaySeconds': "5", 'MaximumMessageSize': "262144",
-                                            'MessageRetentionPeriod': "1209600", 'VisibilityTimeout': "960",
+    response = sqs.create_queue(QueueName="QueueName.fifo",
+                                Attributes={'FifoQueue': "true",
+                                            'DelaySeconds': "5",
+                                            'MaximumMessageSize': "262144",
+                                            'MessageRetentionPeriod': "1209600",
+                                            'VisibilityTimeout': "960",
                                             'ContentBasedDeduplication': "true"})
     queue_url = response['QueueUrl']
 
@@ -98,17 +106,8 @@ def test_push_batch_id_to_nightly_sqs_queue():
     queue_event["batchId"] = generated_batch_id
     queue_events.append(queue_event)
     close_pipeline_obj = ClosePipeline()
-    close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events)
+    close_pipeline_obj.push_batch_id_to_nightly_sqs_queue(queue_events, None)
     assert True
-
-
-"""
-@mock_events
-def test_close_pipeline():
-    with pytest.raises(Exception):
-        close_pipeline_obj = ClosePipeline()
-        assert close_pipeline_obj.close_pipeline(None) is None
-"""
 
 
 def test_close_pipeline():
@@ -116,4 +115,4 @@ def test_close_pipeline():
     close_pipeline.push_batch_id_to_nightly_sqs_queue = MagicMock()
     close_pipeline.delete_sqs_message = MagicMock()
 
-    close_pipeline.close_pipeline(None)
+    close_pipeline.close_pipeline(None, None)
