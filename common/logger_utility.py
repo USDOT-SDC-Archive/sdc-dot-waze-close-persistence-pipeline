@@ -12,8 +12,8 @@ class LoggerUtility:
         logger = logging.getLogger(Constants.LOGGER_NAME)
 
         try:
-            log_level = os.environ(Constants.LOGGER_LOG_LEVEL_ENV_VAR)
-        except Exception as e:
+            log_level = os.environ[Constants.LOGGER_LOG_LEVEL_ENV_VAR]
+        except KeyError:
             log_level = Constants.LOGGER_DEFAULT_LOG_LEVEL
 
         logger.setLevel(logging.getLevelName(log_level))
