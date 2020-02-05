@@ -7,7 +7,8 @@ import boto3
 import pytest
 from botocore.errorfactory import ClientError
 from moto import mock_sqs
-
+from common.logger_utility import LoggerUtility
+from common.constants import Constants
 from lambdas.persistence_close_statemachine_handler import ClosePipeline
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -116,3 +117,20 @@ def test_close_pipeline():
     close_pipeline.delete_sqs_message = MagicMock()
 
     close_pipeline.close_pipeline(None, None)
+
+
+def test_logging():
+    LoggerUtility.set_level()
+    LoggerUtility.log("info", "test test 123")
+
+
+def test_constants_set_attr():
+    constants = Constants()
+    constants.UNSET_ATTR = "foo"
+    assert constants.UNSET_ATTR == "foo"
+
+
+def test_constants_set_attr_already_set():
+    constants = Constants()
+    with pytest.raises(AttributeError):
+        constants.LOGGER_NAME = "foo"
