@@ -20,19 +20,7 @@ class LoggerUtility:
         return True
 
     @staticmethod
-    def log_info(message):
+    def log(log_level_name, message):
         logger = logging.getLogger(Constants.LOGGER_NAME)
-        logger.info('%s', message)
-        return True
-
-    @staticmethod
-    def log_error(message):
-        logger = logging.getLogger(Constants.LOGGER_NAME)
-        logger.error('%s', message)
-        return True
-
-    @staticmethod
-    def log_warning(message):
-        logger = logging.getLogger(Constants.LOGGER_NAME)
-        logger.warning('%s', message)
-        return True
+        log_level = getattr(logging, log_level_name.upper())
+        logger.log(log_level, message)

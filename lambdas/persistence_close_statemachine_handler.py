@@ -18,7 +18,7 @@ class ClosePipeline:
         )
 
     def delete_sqs_message(self, event, context):
-        LoggerUtility.log_info("context: {}".format(context))
+        LoggerUtility.log("INFO", "context: {}".format(context))
         batch_id = ""
         try:
             if "queueUrl" in event[0] and "batchId" in event[0]:
@@ -30,14 +30,14 @@ class ClosePipeline:
                 if json.loads(txt).get("queueUrl") is not None:
                     message = sqs.Message(queue_url, receipt_handle)
                     message.delete()
-                    LoggerUtility.log_info("Message deleted from sqs for batchId {}".format(batch_id))
+                    LoggerUtility.log("INFO", "Message deleted from sqs for batchId {}".format(batch_id))
                     self.publish_message_to_sns({"BatchId": batch_id, "Status": "Persistence process completed"})
         except Exception as e:
-            LoggerUtility.log_error("Unable to delete sqs message for batchId {}".format(batch_id))
+            LoggerUtility.log("ERROR", "Unable to delete sqs message for batchId {}".format(batch_id))
             raise e
 
     def push_batch_id_to_nightly_sqs_queue(self, event, context):
-        LoggerUtility.log_info("context: {}".format(context))
+        LoggerUtility.log("INFO", "context: {}".format(context))
         current_batch_id = ""
         try:
             if "batchId" in event[0]:
@@ -48,11 +48,11 @@ class ClosePipeline:
                 response = nightly_batches_queue.send_message(MessageBody=json.dumps({
                     'BatchId': current_batch_id
                 }), MessageGroupId="WazeNightlyPersistenceBatchesMessageGroup")
-                LoggerUtility.log_info("Successfully pushed the message to nightly queue for batch_id -"
-                                       " {} with response - {}".format(current_batch_id, response))
+                LoggerUtility.log("INFO", "Successfully pushed the message to nightly queue for batch_id -"
+                                          " {} with response - {}".format(current_batch_id, response))
         except Exception as e:
-            LoggerUtility.log_error(
-                "Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
+            LoggerUtility.log(
+                "INFO", "Unable to push sqs message to nightly queue for batchId {}".format(current_batch_id))
             raise e
 
     def close_pipeline(self, event, context):
