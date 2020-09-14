@@ -1,3 +1,7 @@
-[![Build Status](https://travis-ci.org/debbieneaeraconsulting/sdc-dot-svp-ingest-test.svg?branch=master)](https://travis-ci.org/debbieneaeraconsulting/sdc-dot-svp-ingest-test)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline&metric=alert_status)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline&metric=coverage)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-close-persistence-pipeline)
+# This repository is DEPRECATED!
+
+This repository is deprecated as of **08/05/2020**.
+
+The code and infrastructure has moved to https://github.com/usdot-jpo-sdc-projects/sdc-dot-waze-pipeline
+
+Please refer to the waze pipeline repo for all future development.
